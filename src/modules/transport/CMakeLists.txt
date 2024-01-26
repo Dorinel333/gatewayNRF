@@ -6,6 +6,8 @@
 
 target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/transport.c)
 
+target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../sampler/jsonMsg/jsonMsg.c)
+
 # Add Client ID helper library
 add_subdirectory(client_id)
 

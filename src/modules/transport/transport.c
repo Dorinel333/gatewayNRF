@@ -9,9 +9,66 @@
 #include <zephyr/zbus/zbus.h>
 #include <zephyr/smf.h>
 #include <net/mqtt_helper.h>
+#include "jsonMsg.h"
 
 #include "client_id.h"
 #include "message_channel.h"
+
+#define SENSOR_JSON_STRING "{" \
+    "\"sensor\":{" \
+        "\"id\": \"2\"," \
+        "\"values\": [" \
+            "{" \
+                "\"type\": \"temperature\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"humidity\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"PM1_0\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"PM2_5\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"PM4_0\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"PM10\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"#PM0_5\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"#PM1_0\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"#PM2_5\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"#PM4.0\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"#PM10\"," \
+                "\"value\": 33.3" \
+            "}," \
+            "{" \
+                "\"type\": \"PartSize\"," \
+                "\"value\": 33.3" \
+            "}" \
+        "]" \
+    "}" \
+"}"
 
 /* Register log module */
 LOG_MODULE_REGISTER(transport, CONFIG_MQTT_SAMPLE_TRANSPORT_LOG_LEVEL);
@@ -128,14 +185,26 @@ static void publish(struct payload *payload)
 {
 	int err;
 
+	//char stringTEST[950];
+	//
+	// for (int i = 0; i < 950; ++i) {
+	// 	stringTEST[i] = '1';
+	// }
+
 	struct mqtt_publish_param param = {
-		.message.payload.data = payload->string,
-		.message.payload.len = strlen(payload->string),
+		// .message.payload.data = payload->string,
+		// .message.payload.len = strlen(payload->string),
+		.message.payload.data = get_string(),
+		.message.payload.len = strlen(get_string()),
+		//.message.payload.data = SENSOR_JSON_STRING,
+		//.message.payload.len = strlen(SENSOR_JSON_STRING),
 		.message.topic.qos = MQTT_QOS_1_AT_LEAST_ONCE,
 		.message_id = k_uptime_get_32(),
 		.message.topic.topic.utf8 = pub_topic,
 		.message.topic.topic.size = strlen(pub_topic),
 	};
+
+	printk("Lenght sent: %d\n", param.message.payload.len);
 
 	err = mqtt_helper_publish(&param);
 	if (err) {
